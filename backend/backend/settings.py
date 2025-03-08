@@ -143,15 +143,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_ALL_CREDENTIALS = True
 
 SECRET_KEY=os.getenv("SECRET_KEY")
-
 DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DATABASE_ENGINE'),
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
-    }
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 GEOCODE_API_KEY=os.getenv("GEOCODE_API_KEY")
