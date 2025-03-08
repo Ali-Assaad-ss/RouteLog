@@ -489,7 +489,7 @@ const DriverRouteMap = () => {
                     style={{ height: "100%", width: "100%" }}
                     zoomControl={false}
                     // @ts-ignore
-                    whenReady={(event:any) => { mapRef.current = event.target; }}
+                    // whenReady={(event:any) => { mapRef.current = event.target; }}
                   >
                     <ZoomControl position="topright" />
                     <TileLayer
