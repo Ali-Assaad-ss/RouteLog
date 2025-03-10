@@ -202,11 +202,6 @@ const DriverRouteMap = () => {
         mapRef.current.setView([lat, lon], 13, {
           animate: true,
           duration: 0.5,
-          pan: {
-            animate: true,
-            duration: 0.5,
-            easeLinearity: 0.5
-          }
         });
         
         // Open the popup for the selected marker after centering is complete
