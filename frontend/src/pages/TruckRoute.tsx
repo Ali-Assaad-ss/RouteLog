@@ -98,6 +98,7 @@ const DriverRouteMap = () => {
   const [routeSegments, setRouteSegments] = useState<RouteSegment[]|any>([]);
   const [fetchingRoute, setFetchingRoute] = useState<boolean>(false);
   const mapRef = useRef<L.Map | null>(null); // Type the ref
+  const markerRefs = useRef<{[key: number]: L.Marker}>({});
 
 
   useEffect(() => {
@@ -196,12 +197,23 @@ const DriverRouteMap = () => {
       const validLogs = getValidLocationLogs();
       if (validLogs[selectedLogIndex]) {
         const { lat, lon } = validLogs[selectedLogIndex].location;
-        mapRef.current.setView([lat, lon], 13);
         
-        // Trigger popup to open
-        const markers = document.querySelectorAll('.leaflet-marker-icon');
-        if (markers && markers[selectedLogIndex]) {
-          (markers[selectedLogIndex] as HTMLElement).click();
+        // Set view with better zoom level and ensure marker is centered
+        mapRef.current.setView([lat, lon], 13, {
+          animate: true,
+          duration: 0.5,
+          pan: {
+            animate: true,
+            duration: 0.5,
+            easeLinearity: 0.5
+          }
+        });
+        
+        // Open the popup for the selected marker after centering is complete
+        if (markerRefs.current[selectedLogIndex]) {
+          setTimeout(() => {
+            markerRefs.current[selectedLogIndex].openPopup();
+          }, 600); // Increased timeout to ensure map panning is complete
         }
       }
     }
@@ -489,7 +501,7 @@ const DriverRouteMap = () => {
                     style={{ height: "100%", width: "100%" }}
                     zoomControl={false}
                     // @ts-ignore
-                    // whenReady={(event:any) => { mapRef.current = event.target; }}
+                    whenReady={(event:any) => { mapRef.current = event.target; }}
                   >
                     <ZoomControl position="topright" />
                     <TileLayer
@@ -514,14 +526,19 @@ const DriverRouteMap = () => {
                       <Marker
                         key={index}
                         position={[
-                          log.location.lat + (index % 4) * 0.0003, 
-                          log.location.lon + (index % 4) * 0.0003
+                          log.location.lat,  // Removed the offset
+                          log.location.lon
                         ]}
                         icon={createMarkerIcon(getMarkerColor(log.status, log.notes || ''), log)}
                         eventHandlers={{
                           click: () => {
                             setSelectedLogIndex(index);
                           },
+                        }}
+                        ref={(markerElement) => {
+                          if (markerElement) {
+                            markerRefs.current[index] = markerElement;
+                          }
                         }}
                       >
                         <Popup>
